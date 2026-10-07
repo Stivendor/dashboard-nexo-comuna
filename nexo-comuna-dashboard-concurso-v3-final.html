@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Nexo-Comuna — dashboard territorial para Territorio INN 2026">
+<title>Nexo-Comuna | Dashboard territorial</title>
+<style>
+:root{
+  --ink:#122033;
+  --muted:#627083;
+  --line:#dbe2ea;
+  --soft:#f5f7fa;
+  --blue:#155eef;
+  --blue-2:#eaf1ff;
+  --cyan:#0e7490;
+  --green:#087443;
+  --green-bg:#eaf8f0;
+  --amber:#9a6700;
+  --amber-bg:#fff7df;
+  --red:#b42318;
+  --red-bg:#fff0ee;
+  --white:#fff;
+  --max:1180px;
+  --shadow:0 10px 30px rgba(18,32,51,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#f7f9fc;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.5}
+a{color:inherit}
+.container{width:min(var(--max),calc(100% - 40px));margin:auto}
+.topbar{background:var(--ink);color:#fff}
+.topbar .inner{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:.78rem}
+.topbar strong{letter-spacing:.04em}
+.topbar span{opacity:.72}
+nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .inner{height:66px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800}
+.mark{width:34px;height:34px;border-radius:9px;background:var(--blue);display:grid;place-items:center;color:white;font-size:.78rem;letter-spacing:-.03em}
+.navlinks{display:flex;gap:18px;font-size:.8rem;color:var(--muted)}
+.navlinks a{text-decoration:none}
+.hero{padding:64px 0 44px;background:
+ radial-gradient(circle at 84% 22%,rgba(21,94,239,.12),transparent 30%),
+ linear-gradient(180deg,#fff 0%,#f7f9fc 100%);
+}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid #cbd7ea;background:#fff;border-radius:999px;color:#31527d;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--blue)}
+.hero h1{font-size:clamp(2.5rem,6vw,5rem);line-height:.95;letter-spacing:-.065em;max-width:850px;margin:20px 0 20px}
+.hero h1 span{color:var(--blue)}
+.lead{font-size:clamp(1rem,2vw,1.25rem);color:#405064;max-width:760px;margin:0}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;margin-top:36px}
+.problem-card,.signal-card,.section-card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.problem-card{padding:24px}
+.problem-card h2{margin:0 0 10px;font-size:1rem}
+.problem-card p{margin:0;color:#405064}
+.signal-card{padding:24px;background:var(--ink);color:#fff}
+.signal-card .small{color:#b8c3d1;font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.signal-card .big{font-size:3.2rem;font-weight:850;line-height:1;margin:10px 0}
+.signal-card p{color:#d6dee9;margin:0;font-size:.9rem}
+section{padding:34px 0}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:18px}
+.kicker{font-size:.7rem;color:var(--blue);font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.section-head h2{font-size:1.65rem;letter-spacing:-.03em;margin:5px 0 0}
+.section-head p{max-width:570px;margin:0;color:var(--muted);font-size:.9rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.metric{padding:21px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.metric .label{font-size:.76rem;color:var(--muted);font-weight:700}
+.metric .value{font-size:2.15rem;font-weight:850;letter-spacing:-.05em;margin:7px 0 2px}
+.metric .context{font-size:.76rem;color:#697789}
+.badge{display:inline-flex;padding:4px 7px;border-radius:6px;font-size:.65rem;font-weight:800;margin-top:10px}
+.badge.ok{color:var(--green);background:var(--green-bg)}
+.badge.warn{color:var(--amber);background:var(--amber-bg)}
+.badge.neutral{color:#526174;background:#eef2f6}
+.evidence{margin-top:14px;padding:14px 16px;border-left:3px solid var(--blue);background:#fff;border-radius:0 10px 10px 0;color:#536174;font-size:.8rem}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.chart-card h3{margin:0 0 4px;font-size:1rem}
+.chart-card .sub{color:var(--muted);font-size:.78rem;margin-bottom:22px}
+.bar{display:grid;grid-template-columns:145px 1fr 58px;align-items:center;gap:12px;margin:14px 0}
+.bar .name{font-size:.8rem;color:#445367}
+.track{height:14px;background:#edf1f5;border-radius:99px;overflow:hidden}
+.fill{height:100%;border-radius:99px}
+.fill.blue{background:var(--blue)}
+.fill.gray{background:#8794a5}
+.fill.dark{background:#24364e}
+.fill.dash{background:repeating-linear-gradient(90deg,#c8d2df 0 9px,#eef2f6 9px 15px)}
+.bar strong{font-size:.8rem;text-align:right}
+.note{font-size:.74rem;color:#718096;margin:18px 0 0}
+.territory{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+.big-quote{padding:30px;border-radius:18px;background:linear-gradient(135deg,#122033,#1d3557);color:#fff;min-height:300px;display:flex;flex-direction:column;justify-content:space-between}
+.big-quote .tag{font-size:.68rem;color:#aebbd0;text-transform:uppercase;font-weight:800;letter-spacing:.1em}
+.big-quote blockquote{font-size:clamp(1.4rem,3vw,2.25rem);font-weight:750;letter-spacing:-.035em;line-height:1.13;margin:25px 0}
+.big-quote small{color:#c7d1df}
+.missing{background:#fff;border:1px dashed #b8c4d2;border-radius:18px;padding:24px}
+.missing h3{margin:0 0 8px}
+.missing p{font-size:.84rem;color:var(--muted)}
+.missing-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.missing-item{padding:13px;background:var(--soft);border-radius:10px}
+.missing-item b{display:block;font-size:.82rem}
+.missing-item span{font-size:.7rem;color:var(--muted)}
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch}
+.step{position:relative;padding:22px 18px;background:#fff;border:1px solid var(--line);min-height:170px}
+.step:first-child{border-radius:16px 0 0 16px}
+.step:last-child{border-radius:0 16px 16px 0}
+.step:not(:last-child):after{content:"→";position:absolute;right:-10px;top:50%;transform:translateY(-50%);z-index:2;width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:.72rem;font-weight:900}
+.step .n{font-size:.68rem;color:var(--blue);font-weight:900}
+.step h3{font-size:.95rem;margin:9px 0}
+.step p{font-size:.75rem;color:var(--muted);margin:0}
+.data-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.data-card{padding:22px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.data-card .icon{width:36px;height:36px;border-radius:9px;background:var(--blue-2);color:var(--blue);display:grid;place-items:center;font-weight:900;margin-bottom:15px}
+.data-card h3{font-size:.95rem;margin:0 0 7px}
+.data-card p{font-size:.78rem;color:var(--muted);margin:0}
+.data-card ul{margin:13px 0 0;padding-left:18px;color:#536174;font-size:.75rem}
+.ml{display:grid;grid-template-columns:.8fr 1.2fr;gap:16px}
+.score{background:var(--ink);color:#fff;border-radius:18px;padding:28px}
+.score h3{margin:0;font-size:1rem}
+.score .score-num{font-size:4.2rem;font-weight:900;line-height:1;margin:18px 0 8px;color:#8db4ff}
+.score p{color:#c5cfdd;font-size:.8rem}
+.model-box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px}
+.model-row{display:grid;grid-template-columns:1fr 60px 1fr;gap:12px;align-items:center}
+.model-node{padding:13px;background:var(--soft);border-radius:10px;font-size:.78rem}
+.model-arrow{text-align:center;color:var(--blue);font-weight:900}
+.disclaimer{margin-top:16px;padding:12px 14px;background:var(--amber-bg);color:#6d5200;border:1px solid #f1dc9a;border-radius:10px;font-size:.73rem}
+.action{background:#eaf1ff;border:1px solid #c9dafd;border-radius:18px;padding:26px}
+.action h3{margin:0 0 7px}
+.action p{margin:0;color:#445976;font-size:.84rem}
+.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.action-item{background:#fff;padding:17px;border-radius:12px}
+.action-item b{font-size:.8rem}
+.action-item p{font-size:.72rem;margin-top:5px;color:var(--muted)}
+footer{padding:30px 0 50px;border-top:1px solid var(--line);margin-top:20px}
+footer .inner{display:flex;justify-content:space-between;gap:20px;font-size:.72rem;color:#718096}
+@media(max-width:900px){
+ .hero-grid,.territory,.ml,.compare{grid-template-columns:1fr}
+ .grid-4{grid-template-columns:repeat(2,1fr)}
+ .pipeline{grid-template-columns:1fr}
+ .step,.step:first-child,.step:last-child{border-radius:14px;margin-bottom:8px}
+ .step:not(:last-child):after{content:"↓";right:50%;top:auto;bottom:-15px;transform:translateX(50%)}
+ .data-grid,.action-grid{grid-template-columns:1fr}
+ .navlinks{display:none}
+}
+@media(max-width:520px){
+ .container{width:min(var(--max),calc(100% - 24px))}
+ .hero{padding-top:42px}
+ .grid-4{grid-template-columns:1fr}
+ .bar{grid-template-columns:105px 1fr 48px;gap:8px}
+ .section-head{display:block}
+ .section-head p{margin-top:8px}
+ .topbar span{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container inner">
+    <strong>TERRITORIO INN 2026</strong>
+    <span>Diplomado en IA y Datos para Retos del Territorio y Soluciones Innovadoras · Comuna 1</span>
+  </div>
+</div>
+
+<nav>
+  <div class="container inner">
+    <div class="brand"><div class="mark">N</div> NEXO COMUNA</div>
+    <div class="navlinks">
+      <a href="#territorio">Territorio</a>
+      <a href="#brecha">Brecha</a>
+      <a href="#nexo">Nexo</a>
+      <a href="#modelo">IA + datos</a>
+      <a href="#accion">Acción</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="eyebrow"><span class="dot"></span> Producto de datos · Línea 2 Socio-Económica</div>
+    <h1>Convertir <span>experiencia</span> en oportunidades.</h1>
+    <p class="lead">Nexo-Comuna transforma experiencia laboral informal en perfiles profesionales y, al mismo tiempo, construye información territorial para orientar decisiones de empleabilidad en la Comuna 1 — Popular.</p>
+
+    <div class="hero-grid">
+      <div class="problem-card">
+        <h2>El problema que queremos hacer visible</h2>
+        <p>Muchas personas tienen experiencia real en construcción, comercio, cuidado y oficios varios, pero esa experiencia no está documentada de una forma que el mercado laboral formal pueda reconocer. A la vez, falta información territorial granular sobre esa oferta de trabajo.</p>
+      </div>
+      <div class="signal-card">
+        <div class="small">Dato territorial a validar</div>
+        <div class="big">14,91%</div>
+        <p>Tasa reportada para la Comuna 1 en la Encuesta de Calidad de Vida de la Alcaldía de Medellín.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="territorio">
+  <div class="container">
+    <div class="section-head">
+      <div><div class="kicker">01 · El territorio</div><h2>La Comuna 1 concentra una brecha que merece datos</h2></div>
+      <p>Indicadores de contexto tomados de la propuesta y de la dato territorial. Los años y metodologías importan: no todas las cifras son directamente comparables.</p>
+    </div>
+
+    <div class="grid-4">
+      <article class="metric">
+        <div class="label">Población proyectada / referencia</div>
+        <div class="value">145.235</div>
+        <div class="context">habitantes · 5,2% del total de Medellín</div>
+        <span class="badge ok">VERIFICADO EN FICHA</span>
+      </article>
+      <article class="metric">
+        <div class="label">Jefatura femenina</div>
+        <div class="value">50,1%</div>
+        <div class="context">de los hogares · con año a precisar</div>
+        <span class="badge ok">COINCIDE</span>
+      </article>
+      <article class="metric">
+        <div class="label">Informalidad · 13 ciudades</div>
+        <div class="value">40,3%</div>
+        <div class="context">noviembre 2025 – enero 2026</div>
+        <span class="badge ok">CORREGIDO</span>
+      </article>
+      <article class="metric">
+        <div class="label">Desempleo · Colombia</div>
+        <div class="value">8,0%</div>
+        <div class="context">trimestre móvil mayo–julio 2026</div>
+        <span class="badge ok">CORREGIDO</span>
+      </article>
+    </div>
+
+    <div class="evidence"><strong>Nota metodológica:</strong> 145.235 habitantes no cuadraba con el 5,2% indicado; la dato territorial identifica 145.235 como cifra de la ficha. </div>
+  </div>
+</section>
+
+<section id="brecha">
+  <div class="container">
+    <div class="section-head">
+      <div><div class="kicker">02 · La brecha</div><h2>Las referencias muestran el tamaño del reto</h2></div>
+      <p>La comparación sirve como contexto, no como prueba de que todas las tasas fueron calculadas con la misma metodología.</p>
+    </div>
+
+    <div class="compare">
+      <article class="chart-card">
+        <h3>Desempleo: referencias territoriales</h3>
+        <div class="sub">Trimestre móvil mayo–julio 2026, salvo la tasa de Comuna 1 no verificada.</div>
+
+        <div class="bar"><div class="name">Comuna 1</div><div class="track"><div class="fill dash" style="width:100%"></div></div><strong>14,91%</strong></div>
+        <div class="bar"><div class="name">Medellín ciudad</div><div class="track"><div class="fill blue" style="width:49.6%"></div></div><strong>7,4%</strong></div>
+        <div class="bar"><div class="name">Medellín A.M.</div><div class="track"><div class="fill dark" style="width:46.9%"></div></div><strong>7,0%</strong></div>
+        <div class="bar"><div class="name">Colombia</div><div class="track"><div class="fill gray" style="width:54.3%"></div></div><strong>8,0%</strong></div>
+        <p class="note">* Fuente: Encuesta de Calidad de Vida, Alcaldía de Medellín. Medellín y nacional: DANE, trimestre móvil mayo–julio 2026; periodos distintos por disponibilidad de cada fuente.</p>
+      </article>
+
+      <article class="chart-card">
+        <h3>Condiciones de vida: cuidado con la comparación</h3>
+        <div class="sub">El IMCV cambia de metodología y de periodo; por eso aquí se evita una falsa comparación visual.</div>
+        <div class="missing-grid">
+          <div class="missing-item"><b>Comuna 1 · 33,95</b><span>Departamento Administrativo de Planeación · dato 2025</span></div>
+          <div class="missing-item"><b>Medellín · 45,19</b><span>Departamento Administrativo de Planeación · dato 2025</span></div>
+          <div class="missing-item"><b>33,95</b><span>Departamento Administrativo de Planeación · dato 2025</span></div>
+          <div class="missing-item"><b>45,19</b><span>Departamento Administrativo de Planeación · dato 2025</span></div>
+        </div>
+        <p class="note">Fuente: Comuna 1 — Plan de Desarrollo Medellín 2024–2027 (dato 2023). Ciudad — Departamento Administrativo de Planeación (dato 2025).</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="nexo">
+  <div class="container">
+    <div class="section-head">
+      <div><div class="kicker">03 · El vacío de datos</div><h2>El problema no es solo la falta de empleo. También falta información.</h2></div>
+      <p>La propuesta de Nexo convierte cada interacción, de forma agregada y anonimizada, en una oportunidad para conocer mejor la oferta de trabajo del territorio.</p>
+    </div>
+
+    <div class="territory">
+      <div class="big-quote">
+        <div class="tag">La oportunidad de Nexo</div>
+        <blockquote>“La experiencia existe. Lo que falta es convertirla en un perfil reconocible y en información útil para decidir.”</blockquote>
+        <small>Propuesta Territorio INN 2026 · Nexo-Comuna</small>
+      </div>
+      <div class="missing">
+        <h3>Lo que el piloto comenzará a medir</h3>
+        <p>Estos indicadores forman parte del producto de datos propuesto para el piloto.</p>
+        <div class="missing-grid">
+          <div class="missing-item"><b>Experiencia informal</b><span>años y tipo de experiencia</span></div>
+          <div class="missing-item"><b>Perfil ocupacional</b><span>sector económico y habilidades</span></div>
+          <div class="missing-item"><b>Distribución territorial</b><span>barrio dentro de la comuna</span></div>
+          <div class="missing-item"><b>Tránsito a formalidad</b><span>seguimiento de vinculación</span></div>
+          <div class="missing-item"><b>Alfabetización digital</b><span>nivel autoevaluado</span></div>
+          <div class="missing-item"><b>Formación</b><span>participación en talleres</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div><div class="kicker">04 · De conversación a dato</div><h2>Un flujo que convierte experiencia en evidencia territorial</h2></div>
+    </div>
+    <div class="pipeline">
+      <div class="step"><div class="n">01</div><h3>La persona cuenta</h3><p>Experiencia, oficios, años trabajados, habilidades y contexto.</p></div>
+      <div class="step"><div class="n">02</div><h3>La IA estructura</h3><p>El chatbot guía la conversación y genera una hoja de vida profesional.</p></div>
+      <div class="step"><div class="n">03</div><h3>El dato se agrega</h3><p>Los registros se convierten en indicadores territoriales anonimizados.</p></div>
+      <div class="step"><div class="n">04</div><h3>El modelo analiza</h3><p>Machine Learning identifica patrones y perfiles que requieren apoyo.</p></div>
+      <div class="step"><div class="n">05</div><h3>Se decide mejor</h3><p>Entidades y aliados pueden focalizar formación y oportunidades.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="modelo">
+  <div class="container">
+    <div class="section-head">
+      <div><div class="kicker">05 · IA + datos</div><h2>El dashboard es la interfaz; la inteligencia está detrás</h2></div>
+      <p>El modelo de Machine Learning forma parte de la solución propuesta y será desarrollado durante el piloto.</p>
+    </div>
+
+    <div class="ml">
+      <div class="score">
+        <div class="kicker" style="color:#8db4ff">Concepto del piloto</div>
+        <h3>Score de potencial de empleabilidad</h3>
+        <div class="score-num">—</div>
+        <p>El score será construido durante el piloto a partir de los datos de la plataforma y de la variable objetivo de vinculación laboral. Su finalidad es priorizar acompañamiento.</p>
+      </div>
+
+      <div class="model-box">
+        <div class="model-row">
+          <div class="model-node"><strong>Entradas</strong><br>Edad · género · barrio · educación · experiencia · sector · habilidades digitales · ingreso · talleres</div>
+          <div class="model-arrow">→</div>
+          <div class="model-node"><strong>Modelo ML</strong><br>Patrones de empleabilidad y necesidad de acompañamiento</div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="model-row">
+          <div class="model-node"><strong>Resultado objetivo</strong><br>Vinculación a empleo formal</div>
+          <div class="model-arrow">→</div>
+          <div class="model-node"><strong>Acción</strong><br>Focalizar formación, seguimiento y oportunidades</div>
+        </div>
+        <div class="disclaimer"><strong>El modelo está orientado a focalizar acompañamiento y oportunidades de empleo formal.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div><div class="kicker">06 · Producto de datos</div><h2>¿Qué verá una entidad pública?</h2></div>
+      <p>La propuesta define tres indicadores principales para el dashboard y un modelo de priorización.</p>
+    </div>
+
+    <div class="data-grid">
+      <article class="data-card">
+        <div class="icon">01</div>
+        <h3>Mapa de informalidad por barrio</h3>
+        <p>Concentración de experiencia laboral informal dentro de la Comuna 1.</p>
+        <ul><li>Fuente: registros de Nexo</li><li>Actualización propuesta: mensual</li></ul>
+      </article>
+      <article class="data-card">
+        <div class="icon">02</div>
+        <h3>Perfil ocupacional territorial</h3>
+        <p>Distribución por sector económico y nivel de habilidades de la mano de obra registrada.</p>
+        <ul><li>Fuente: formularios y hojas de vida</li><li>Actualización propuesta: mensual</li></ul>
+      </article>
+      <article class="data-card">
+        <div class="icon">03</div>
+        <h3>Tasa de tránsito a la formalidad</h3>
+        <p>Seguimiento de usuarios que reportan vinculación formal después de usar la plataforma.</p>
+        <ul><li>Fuente: encuesta de seguimiento</li><li>Periodicidad propuesta: trimestral</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="accion">
+  <div class="container">
+    <div class="action">
+      <div class="kicker">07 · Del dato a la acción</div>
+      <h3>El objetivo final no es tener un dashboard bonito.</h3>
+      <p>Es transformar información territorial en intervenciones de empleabilidad más focalizadas y conectar a personas que hoy quedan fuera de la primera etapa del mercado formal.</p>
+      <div class="action-grid">
+        <div class="action-item"><b>Alcaldía y entidades</b><p>Focalizar programas de formación y acompañamiento según evidencia territorial.</p></div>
+        <div class="action-item"><b>Empresas aliadas</b><p>Acceder a talento con experiencia documentada y perfiles estructurados.</p></div>
+        <div class="action-item"><b>Residentes</b><p>Pasar de “sé hacer este oficio” a una hoja de vida y un perfil profesional.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container inner">
+    <span><strong>NEXO COMUNA</strong> · Territorio INN 2026 · Línea 2 Socio-Económica</span>
+    <span>Medellín · 4 de septiembre de 2026</span>
+  </div>
+</footer>
+
+</body>
+</html>
